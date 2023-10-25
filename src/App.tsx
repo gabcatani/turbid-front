@@ -22,8 +22,8 @@ const Screen = styled.div`
   align-items: center;
 `;
 
-const Title = styled.h1`
-  color: #BF4F74;
+const Title = styled.h1<{ color?: string }>`
+  color: ${props => props.color || '#BF4F74'};
 `;
 
 const Image = styled.img`
@@ -101,6 +101,7 @@ function App() {
     setImage(null);
     setPoints([]);
     setHabilitySend(true)
+    setBlockClick(false)
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +120,9 @@ function App() {
   };
   
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    if(blockCLick) return 
+    if (points.length === 0) {
+      setBlockClick(false)
+    }
     if (imageRef.current) {
       const rect = imageRef.current.getBoundingClientRect();
       const x = Math.round(e.clientX - rect.left);  
@@ -139,14 +142,11 @@ function App() {
     }
   };
   
-
-  
   const handleButtonClick = async () => {
     setIsLoading(true)
     try {
       const response = await axios.post('https://8137-2804-1100-8b04-3b01-8cfa-de26-4a9b-677.ngrok-free.app/evaluate_water', { coord_copo: coordsFirstClick, coord_fundo: coordsSecondClick, image_base64: imageBase64});
       const analyses = response.data as IAnalysisData;
-      console.log('Analyses:', analyses)
       setResponseData({
         codigoAnaliseDois: analyses.codigoAnaliseDois,
         codigoAnaliseUm: analyses.codigoAnaliseUm})
@@ -168,16 +168,22 @@ function App() {
       : (<>
       {responseData ? 
           <Title style={{fontSize: '2em'}}> 
-            Resultado dos dados enviados <br />
-            - <br />
-            <span style={{color: 'green'}}>OpenCV (teste de coloração dos pixels): {responseData.codigoAnaliseUm}</span> <br />
-            - <br />
-            <span style={{color: 'blue'}}>Modelo de IA: {responseData.codigoAnaliseDois}</span>
+          Resultado dos dados enviados <br />
+          - <br />
+          <span style={{color: 'gray'}}>OpenCV (teste de coloração dos pixels):</span> <span style={{color: 'green'}}>{responseData.codigoAnaliseUm}</span> <br />
+          - <br />
+          <span style={{color: 'white'}}>Modelo de IA:</span> <span style={{color: 'blue'}}>{responseData.codigoAnaliseDois}</span>
         </Title>
           : 
           <>
-          <Title>Envie sua imagem!</Title> 
-            {!image ? null : (points.length === 0 ? <Title>Clique no Copo</Title> : <Title>Clique no Fundo Da Imagem</Title>)}
+          <Title color='white'>Envie sua imagem!</Title> 
+          {blockCLick ? 
+            <Title>Dados coletados</Title> 
+            : 
+            <>
+              {!image ? null : (points.length === 0 ? <Title color='violet'>Clique no Copo</Title> : <Title color='violet'>Clique no Fundo Da Imagem</Title>)}
+            </>
+          }
             {!image ? 
           <UploadContainer onClick={() => {
             const fileInput = document.getElementById('fileInput');
