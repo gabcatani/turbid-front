@@ -145,13 +145,14 @@ function App() {
   const handleButtonClick = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('https://8137-2804-1100-8b04-3b01-8cfa-de26-4a9b-677.ngrok-free.app/evaluate_water', { coord_copo: coordsFirstClick, coord_fundo: coordsSecondClick, image_base64: imageBase64});
+      const response = await axios.post('https://4c5e-191-52-178-72.ngrok-free.app/evaluate_water', { coord_copo: coordsFirstClick, coord_fundo: coordsSecondClick, image_base64: imageBase64});
       const analyses = response.data as IAnalysisData;
       setResponseData({
         codigoAnaliseDois: analyses.codigoAnaliseDois,
         codigoAnaliseUm: analyses.codigoAnaliseUm})
     } catch (error) {
       console.error('An error occurred while sending data:', error);
+      clearAllParameters()
     }
     finally {
       setIsLoading(false)
